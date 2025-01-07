@@ -108,7 +108,7 @@ class embed(nn.Module):
         )
         features.append(dow_emb)
         adp_emb = self.adaptive_embedding.expand(
-            size=(self.batch_size, *self.adaptive_embedding.shape)
+            size=(x.shape[0], *self.adaptive_embedding.shape)
         )
         features.append(adp_emb)
         x = torch.cat(features, dim=-1)
@@ -269,7 +269,7 @@ class Mamba(nn.Module):
         inp = self.gcnlayer(inp)
         inp = inp.view(B, L, self.config.num_nodes, D)  # (B, L, N, D)
         inp = inp.transpose(1, 2)  # (B, N, L, D)
-        inp = inp.view(BN, L, D)
+        inp = inp.reshape(BN, L, D)
         # inp = inp.transpose(1,2)
         # inp = self.linear1(inp)
         # inp = inp.transpose(1,2)
@@ -295,8 +295,6 @@ class ResidualBlock(nn.Module):
         self.config = config
         self.mixer = MambaBlock(config)
         self.mixer1 = MambaBlock(config)
-        self.mixer2 = MambaBlock(config)
-        self.mixer3 = MambaBlock(config)
         self.norm = RMSNorm(config.d_model)
         self.Weight = nn.Linear(2 * config.d_model, config.d_model)
         self.Weight2 = nn.Linear(2 * config.d_model, config.d_model)
